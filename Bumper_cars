@@ -1,0 +1,179 @@
+// NOTE THAT THIS WAS WRITTEN ON A DIFFERENT PLATFORM, DO NOT TRY TO USE NORMAL PYTHON TO RUN THE CODE
+// USE THIS LINK TO PLAY THE GAME https://academy.cs.cmu.edu/sharing/coralSheep4785
+
+app.background = 'darkRed'
+
+# players
+player1 = Group(
+    Oval(30, 30, 60, 40, fill=gradient('salmon', 'white', start='left'),
+         border='white', borderWidth=5),
+    Line(10, 10, 25, 10, lineWidth=8),
+    Line(40, 10, 55, 10, lineWidth=8),
+    Line(10, 50, 25, 50, lineWidth=8),
+    Line(40, 50, 55, 50, lineWidth=8),
+    Oval(50, 30, 5, 20),
+    Line(25, 20, 50, 25, fill='dimGrey'),
+    Line(25, 40, 50, 35, fill='dimGrey'),
+    Oval(30, 30, 20, 30, fill='dimGrey'),
+    Circle(30, 30, 10),
+    Polygon(5, 30, -5, -10, -10, -10, -10, -8)
+    )
+
+player2 = Group(
+    Oval(370, 370, 60, 40, fill=gradient('cornflowerBlue', 'white', start='left'),
+         border='white', borderWidth=5),
+    Line(390, 390, 375, 390, lineWidth=8),
+    Line(360, 390, 345, 390, lineWidth=8),
+    Line(390, 350, 375, 350, lineWidth=8),
+    Line(360, 350, 345, 350, lineWidth=8),
+    Oval(350, 370, 5, 20),
+    Line(375, 380, 350, 375, fill='dimGrey'),
+    Line(375, 360, 350, 365, fill='dimGrey'),
+    Oval(370, 370, 20, 30, fill='dimGrey'),
+    Circle(370, 370, 10),
+    Polygon(395, 370, 405, 410, 410, 410, 410, 408)
+    )
+
+offenseInfo = Label('Player 1 is on Offense', 200, 20, fill='salmon', size=24)
+Label('Time until switch:', 180, 50, fill='white', size=15)
+Label('W,A,S,D for player1 and Arrow keys for player2', 200, 70, fill='white', size=15)
+timer = Label(200, 250, 50, fill='white', size=15)
+Boost= Group(
+    Rect(50,200, 50, 50, fill='springGreen'),
+    Rect(250,190, 50, 50, fill='springGreen')
+)
+Boost.toBack()
+Decrease= Group(
+    Rect(180, 300, 50, 50, fill ='red'),
+    Rect(300, 100, 50, 50, fill ='red'),
+    Rect(95, 100, 50, 50, fill='red')
+)
+Decrease.toBack()
+
+def wrapPlayer(player):
+    if (player.centerX > 400):
+        player.centerX = 0
+    elif (player.centerX < 0):
+        player.centerX = 400
+
+    if (player.centerY > 400):
+        player.centerY = 0
+    elif (player.centerY < 0):
+        player.centerY = 400
+
+def onKeyHold(keys):
+    # Move player1 in response to the keys w-a-s-d (up-left-down-right).
+    # Turn the car to the appropriate angle for each direction it moves.
+    if ('w' in keys):
+        player1.rotateAngle = -90
+        player1.centerY -= 10
+    if('s' in keys):
+        player1.rotateAngle = 90
+        player1.centerY += 10
+    if ('a' in keys):
+        player1.rotateAngle = 180
+        player1.centerX -= 10
+    if ('d' in keys):
+        player1.rotateAngle = 0
+        player1.centerX += 10
+    
+    # Move player2 in response to the respective arrow keys. Turn the car
+    # to the appropriate angle for each direction it moves.
+    if ('up' in keys):
+        player2.rotateAngle = 90
+        player2.centerY -= 10
+    if ('down' in keys):
+        player2.rotateAngle = -90
+        player2.centerY += 10
+    if ('left' in keys):
+        player2.rotateAngle = 0
+        player2.centerX -= 10
+    if ('right' in keys):
+        player2.rotateAngle = 180
+        player2.centerX += 10
+    # Call the helper function to wrap the players around when they leave the
+    # canvas.
+    if(player1.centerX < 0 or player1.centerX > 400 or player1.centerY < 0 or player1.centerY > 400):
+      wrapPlayer(player1)
+    if (player2.centerX < 0 or player2.centerX > 400 or player2.centerY < 0 or player2.centerY > 400):
+        wrapPlayer(player2)
+
+    # End the game if the cars collide, and then display the winner.
+    if (offenseInfo.fill == 'cornflowerBlue' and player2.hitsShape(player1)):
+        offenseInfo.value = 'Player 2 Wins!'
+        app.paused = True
+    if (offenseInfo.fill == 'salmon' and player1.hitsShape(player2)):
+        offenseInfo.value = 'Player 1 Wins!'
+        app.paused = True
+    # Boost and Decrease the player speed when they hit the group.
+    if (player1.hitsShape(Boost)):
+        if ('w' in keys):
+            player1.rotateAngle = -90
+            player1.centerY -= 15
+        if('s' in keys):
+            player1.rotateAngle = 90
+            player1.centerY += 15
+        if ('a' in keys):
+            player1.rotateAngle = 180
+            player1.centerX -= 15
+        if ('d' in keys):
+            player1.rotateAngle = 0
+            player1.centerX += 15
+    
+    if (player1.hitsShape(Decrease)):
+        if ('w' in keys):
+            player1.rotateAngle = -90
+            player1.centerY -= 5
+        if('s' in keys):
+            player1.rotateAngle = 90
+            player1.centerY += 5
+        if ('a' in keys):
+            player1.rotateAngle = 180
+            player1.centerX -= 5
+        if ('d' in keys):
+            player1.rotateAngle = 0
+            player1.centerX += 5
+    
+    if (player2.hitsShape(Boost)):
+        if ('up' in keys):
+            player2.rotateAngle = 90
+            player2.centerY -= 15
+        if ('down' in keys):
+            player2.rotateAngle = -90
+            player2.centerY += 15
+        if ('left' in keys):
+            player2.rotateAngle = 0
+            player2.centerX -= 15
+        if ('right' in keys):
+            player2.rotateAngle = 180
+            player2.centerX += 15
+    
+    if (player2.hitsShape(Decrease)):
+        if ('up' in keys):
+            player2.rotateAngle = 90
+            player2.centerY -= 5
+        if ('down' in keys):
+            player2.rotateAngle = -90
+            player2.centerY += 5
+        if ('left' in keys):
+            player2.rotateAngle = 0
+            player2.centerX -= 5
+        if ('right' in keys):
+            player2.rotateAngle = 180
+            player2.centerX += 5
+    pass
+
+def onStep():
+    # When the timer is 0, changes who is on offense and resets the timer.
+    timer.value -= 1
+    if (timer.value <= 0):
+        if (offenseInfo.fill == 'cornflowerBlue'):
+            offenseInfo.value = 'Player 1 is on Offense'
+            offenseInfo.fill = 'salmon'
+            app.background = 'darkRed'
+        else:
+            offenseInfo.value = 'Player 2 is on Offense'
+            offenseInfo.fill = 'cornflowerBlue'
+            app.background = 'darkBlue'
+
+        timer.value = 200
